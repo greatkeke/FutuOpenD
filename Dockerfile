@@ -7,7 +7,8 @@ WORKDIR /app
 # Copy FutuOpenD files
 COPY Futu_OpenD_9.2.5208_Ubuntu16.04/ /app
 
-VOLUME /app/FutuOpenD/FutuOpenD.xml
+VOLUME /app/config
+EXPOSE 11111
 
 # Run FutuOpenD
-CMD ["/app/FutuOpenD"]
+CMD ["/app/FutuOpenD", "-cfg_file", "/app/config/FutuOpenD.xml"]
