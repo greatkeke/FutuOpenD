@@ -1,7 +1,6 @@
 services:
   futu-opend:
-    build: .
-    image: futu-opend:latest
+    image: greatkeke/futu-opend:latest
     container_name: futu-opend
     restart: unless-stopped
     ports:
