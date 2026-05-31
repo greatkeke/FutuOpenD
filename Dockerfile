@@ -59,7 +59,7 @@ RUN mkdir -p /app/config
 EXPOSE 11111
 EXPOSE 22222
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=5s --start-period=180s --retries=3 \
     CMD bash -c 'echo > /dev/tcp/localhost/11111' || exit 1
 
 CMD if [ -f /app/config/FutuOpenD.xml ]; then \
