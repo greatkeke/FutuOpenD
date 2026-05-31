@@ -1,0 +1,17 @@
+services:
+  futu-opend:
+    build: .
+    image: futu-opend:latest
+    container_name: futu-opend
+    restart: unless-stopped
+    ports:
+      - "11111:11111"   # API (行情+交易)
+      - "22222:22222"   # Telnet 远程命令
+    volumes:
+      - ./config:/app/config
+    environment:
+      # Option 1: Use config file (recommended) — just mount ./config/FutuOpenD.xml
+      # Option 2: Use env vars (config file will be ignored)
+      # - FUTU_LOGIN_ACCOUNT=your_account
+      # - FUTU_LOGIN_PWD=your_password
+      - TZ=Asia/Shanghai

@@ -2,10 +2,37 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      opend_version:
+        description: "OpenD version to build (leave empty for auto-detect)"
+        required: false
+        default: ""
 
 jobs:
+  detect-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.detect.outputs.version }}
+    steps:
+      - name: Detect latest OpenD version
+        id: detect
+        run: |
+          if [ -n "${{ github.event.inputs.opend_version }}" ]; then
+            VERSION="${{ github.event.inputs.opend_version }}"
+          else
+            # Resolve the redirect to get the actual filename and extract version
+            REDIRECT_URL=$(curl -sI "https://www.futunn.com/download/fetch-lasted-link?name=opend-ubuntu" | grep -i "^location:" | tr -d '\r' | awk '{print $2}')
+            echo "Redirect URL: $REDIRECT_URL"
+            # Extract version from filename like Futu_OpenD_10.6.6608_Ubuntu18.04.tar.gz
+            VERSION=$(echo "$REDIRECT_URL" | grep -oP 'OpenD_\K[0-9]+\.[0-9]+\.[0-9]+')
+          fi
+          echo "Detected version: $VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
   build-and-push:
+    needs: detect-version
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,9 +49,8 @@ jobs:
         with:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/futu-opend
           tags: |
-            latest
-            type=ref,event=branch
-            type=ref,event=tag
+            type=raw,value=latest
+            type=raw,value=${{ needs.detect-version.outputs.version }}
             type=sha
 
       - name: Build and push
@@ -32,5 +58,7 @@ jobs:
         with:
           context: .
           push: true
+          build-args: |
+            OPEND_VERSION=${{ needs.detect-version.outputs.version }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
