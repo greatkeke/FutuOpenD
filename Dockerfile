@@ -51,8 +51,8 @@ COPY --from=downloader /tmp/opend/ /app/
 # Make binaries executable
 RUN chmod +x /app/FutuOpenD /app/FTWebSocket /app/FTUpdate 2>/dev/null || true
 
-# Generate RSA private key for cross-network trade encryption
-RUN openssl genrsa -out /app/rsa_private_key.pem 2048 2>/dev/null
+# # Generate RSA private key for cross-network trade encryption
+# RUN openssl genrsa -out /app/rsa_private_key.pem 2048 2>/dev/null
 
 RUN mkdir -p /app/config
 
