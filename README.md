@@ -69,7 +69,9 @@ docker run -d \
 
 当 OpenD 监听地址为 `0.0.0.0`（允许远程连接）时，**交易接口要求 RSA 加密**。行情接口不受此限制。
 
-本镜像在构建时自动生成 RSA 密钥对，密钥路径已预配置在 `/app/rsa_private_key.pem`。
+本镜像在启动时自动生成 RSA 私钥，并将其保存在容器的 `/app/config/rsa_private_key.pem`。如果同一个容器通过 `docker restart` 重启，密钥文件会继续保留，不会重新生成。
+
+如果你希望容器被删除后再次创建时仍然保留同一把密钥，请挂载本地 `./config` 目录到容器，这样密钥会写入到宿主机的 `./config/rsa_private_key.pem`，客户端可以直接复用同一文件。
 
 如果你的 Python SDK 连接远程 OpenD 交易时遇到以下错误：
 ```
